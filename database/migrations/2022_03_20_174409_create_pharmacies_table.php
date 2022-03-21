@@ -19,8 +19,8 @@ return new class extends Migration
 			$table->string('kod_pocztowy');
 			$table->string('ulica');
 			$table->string('miejscowosc');
-			$table->double('gps_dlugosc');
-			$table->double('gps_szerokosc');
+			$table->double('gps_dlugosc')->nullable();
+			$table->double('gps_szerokosc')->nullable();
             $table->timestamps();
         });
     }

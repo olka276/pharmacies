@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\JsonImporterController;
+use App\Http\Controllers\{JsonImporterController, PharmaciesController};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/', [JsonImporterController::class, '__invoke']);
+Route::get('/pharmacies', [PharmaciesController::class, 'index']);
