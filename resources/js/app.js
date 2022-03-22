@@ -8,6 +8,17 @@ require('./bootstrap');
 
 window.Vue = require('vue').default;
 
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+
+// Import Bootstrap an BootstrapVue CSS files (order is important)
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+// Make BootstrapVue available throughout your project
+Vue.use(BootstrapVue)
+// Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin)
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -20,6 +31,7 @@ window.Vue = require('vue').default;
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('data-table', require('./components/Table.vue').default);
+Vue.component('uploader', require('./components/Uploader.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
