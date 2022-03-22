@@ -1,6 +1,16 @@
 <template>
   <div class="container">
-   <table class="table">
+    <div class="search-wrapper">
+      <label>Szukaj:</label>
+
+      <input type="text" v-model="nameSearch"  @input="filter('name', $event.target.value)"
+             placeholder="Nazwa"/>
+      <input type="text" @input="filter('post_code', $event.target.value)"
+             placeholder="Kod pocztowy"/>
+      <input type="text" @input="filter('city', $event.target.value)"
+             placeholder="Miejscowość"/>
+    </div>
+    <table class="table">
       <thead>
       <tr>
         <th scope="col">Id</th>
@@ -23,16 +33,18 @@
       </tbody>
     </table>
 
-    <nav aria-label="...">
+    <nav v-if="this.pharmacies.length > 0" aria-label="...">
       <ul class="pagination">
         <li :class="[activePage === 1 ? 'disabled' : '', 'page-item']">
-          <a @click="getResults(activePage-1)" class="page-link">Poprzedni</a>
+          <a @click="filter('name', nameSearch, activePage-1)" class="page-link">Poprzedni</a>
         </li>
 
-        <li :class="[{active: activePage === name+1}, 'page-item']" v-for="(value, name, index) in links"><a @click="getResults(name+1)" class="page-link">{{ name + 1 }}</a></li>
+        <li :class="[{active: activePage === name+1}, 'page-item']" v-for="(value, name, index) in links">
+          <a @click="filter('name', nameSearch, name + 1)" class="page-link">{{ name + 1 }}</a>
+        </li>
 
         <li :class="[activePage === links.length ? 'disabled' : '', 'page-item']">
-          <a @click="getResults(activePage+1)" class="page-link">Następny</a>
+          <a @click="filter('name', nameSearch, activePage + 1)" class="page-link">Następny</a>
         </li>
       </ul>
     </nav>
@@ -43,6 +55,7 @@
 export default {
   data() {
     return {
+      nameSearch: "",
       pharmacies: [],
       links: [],
       activePage: 1,
@@ -56,29 +69,26 @@ export default {
         .then(response => {
           this.pharmacies = response.data.data
           this.links = response.data.links
-
-          console.log(response.data)
-
         })
         .catch(error => {
-          console.log(error)
           this.errored = true
         })
-
-    // this.getResults()
   },
-
   methods: {
-    getResults(page) {
-      console.log(page)
-      this.activePage = page
+    filter(key, value, page) {
+      console.log(key, value, page)
+      this.activePage = page === undefined ? 1 : page
+      const params = {
+        page: this.activePage
+      }
+      params[key] = value
       axios
-          .get("/api/pharmacies?page=" + page)
+          .get("/api/pharmacies", {params})
           .then(response => {
-            console.log(response)
-
             this.pharmacies = response.data.data;
-            console.log(response.data);
+            this.links = response.data.links
+            this.links.pop();
+            this.links.shift();
           });
     }
   }
