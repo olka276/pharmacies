@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\{JsonImporterController, PharmaciesController};
-use Illuminate\Http\Request;
+use App\Http\Controllers\{JsonImporterController, PharmaciesController, ExportController};
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,5 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/', [JsonImporterController::class, '__invoke']);
+Route::post('/', [JsonImporterController::class, '__invoke'])->name('uploader');
 Route::get('/pharmacies', [PharmaciesController::class, 'index']);
+Route::post('/export', [ExportController::class, '__invoke']);

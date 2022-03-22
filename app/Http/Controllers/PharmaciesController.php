@@ -4,19 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PharmacyResource;
 use App\Models\Pharmacy;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PharmaciesController extends Controller
 {
-	public function index(Request $request)
+	/**
+	 * Get list of Pharmacies
+	 *
+	 * @param Request $request
+	 *
+	 * @return JsonResponse
+	 */
+	public function index(Request $request): JsonResponse
 	{
-		$filters = [
-			'name'      => $request->get('name'),
-			'post_code' => $request->get('post_code'),
-			'city'      => $request->get('city'),
-		];
-
 		$pharmaciesQuery = Pharmacy::query();
 
 		$pharmaciesQuery
@@ -27,8 +29,7 @@ class PharmaciesController extends Controller
 			->when(!is_null($city = $request->get('city')),
 				fn($q) => $q->where('miejscowosc', 'like', '%' . $city . '%'));
 
-
-		$pharmacies = PharmacyResource::collection($pharmaciesQuery->paginate());
-		return response()->json($pharmacies, Response::HTTP_OK);
+//		dd($pharmaciesQuery->paginate());
+		return response()->json($pharmaciesQuery->paginate(), Response::HTTP_OK);
 	}
 }
