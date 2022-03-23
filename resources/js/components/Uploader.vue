@@ -1,6 +1,9 @@
 <template>
-  <div class="container p-3">
-    <form :action="route" method="post"
+  <div class="container p-5 d-flex justify-content-end">
+    <div v-if="errored" class="alert alert-danger" role="alert">
+      Wystąpił błąd importu pliku. Upewnij się, że plik ma właściwy format.
+    </div>
+    <form action="" method=""
           enctype="multipart/form-data">
       <label class="custom-file-label">Import pliku</label>
       <div class="custom-file">
@@ -18,10 +21,10 @@
 <script>
 export default {
   name: "Uploader",
-  props: ['route'],
   data() {
     return {
-      file: []
+      file: [],
+      errored: false
     }
   },
   methods: {
@@ -29,9 +32,12 @@ export default {
       const files = event.target.files
       this.file = files[0]
     },
-    importData() {
+    importData(event) {
       var formData = new FormData();
       formData.append("json_file", this.file);
+      if (event) {
+        event.preventDefault()
+      }
       axios
           .post('/api', formData, {
             headers: {
@@ -39,10 +45,18 @@ export default {
             }
           })
           .then(response => {
-            console.log(response.data)
+            this.errored = false
+            window.location.reload(true);
           })
           .catch(error => {
-            console.log(error)
+            // console.log(error)
+            if(error.status === 500 ) {
+              console.log('500')
+            }
+           if(error.status === 422 ) {
+              console.log('422')
+            }
+
             this.errored = true
           })
     }

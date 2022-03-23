@@ -26,6 +26,7 @@
     },
     "dependencies": {
         "bootstrap-vue": "^2.21.2",
+        "jw-vue-pagination": "^1.0.3",
         "laravel-vue-pagination": "^3.0.0",
         "vue-pagination-tw": "^0.1.2"
     }

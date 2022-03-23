@@ -7,6 +7,7 @@ use App\Transformers\JsonFileTransformer;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class JsonImporterController extends Controller
@@ -34,8 +35,16 @@ class JsonImporterController extends Controller
 
 		unset($pharmacyData);
 
-		Pharmacy::insert($pharmaciesData);
+		DB::beginTransaction();
 
+		try {
+			Pharmacy::query()->delete();
+			Pharmacy::insert($pharmaciesData);
+			DB::commit();
+		} catch (\Exception $e) {
+			DB::rollBack();
+			throw $e;
+		}
 		return response()->json([
 			'message' => 'Import successful.'
 		], Response::HTTP_OK);

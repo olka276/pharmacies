@@ -13,6 +13,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import JwPagination from 'jw-vue-pagination';
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
@@ -32,6 +33,8 @@ Vue.use(IconsPlugin)
 
 Vue.component('data-table', require('./components/Table.vue').default);
 Vue.component('uploader', require('./components/Uploader.vue').default);
+Vue.component('exporter', require('./components/Exporter.vue').default);
+Vue.component('jw-pagination', JwPagination);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

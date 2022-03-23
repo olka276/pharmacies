@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PharmacyResource;
 use App\Models\Pharmacy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +18,7 @@ class PharmaciesController extends Controller
 	 */
 	public function index(Request $request): JsonResponse
 	{
-		$pharmaciesQuery = Pharmacy::query();
+		$pharmaciesQuery = Pharmacy::query()->select(['id', 'nazwa', 'kod_pocztowy', 'miejscowosc', 'ulica', 'gps_szerokosc', 'gps_dlugosc']);
 
 		$pharmaciesQuery
 			->when(!is_null($name = $request->input('name')),
@@ -29,7 +28,6 @@ class PharmaciesController extends Controller
 			->when(!is_null($city = $request->get('city')),
 				fn($q) => $q->where('miejscowosc', 'like', '%' . $city . '%'));
 
-//		dd($pharmaciesQuery->paginate());
-		return response()->json($pharmaciesQuery->paginate(), Response::HTTP_OK);
+		return response()->json($pharmaciesQuery->paginate($request->input('pagination') ?? ''), Response::HTTP_OK);
 	}
 }

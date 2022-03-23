@@ -13,8 +13,8 @@
 <body>
 <div id='app'>
     <h3 class="text-center m-5">Spis aptek</h3>
-    <data-table></data-table>
     <uploader route="{{ route('uploader') }}"></uploader>
+    <data-table></data-table>
 
 </div>
 

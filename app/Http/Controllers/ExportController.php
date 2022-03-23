@@ -6,6 +6,7 @@ use App\Exporters\CsvExporter;
 use App\Exporters\Exporter;
 use App\Exporters\JsonExporter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\MockObject\UnknownClassException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -18,27 +19,34 @@ class ExportController extends Controller
 	 *
 	 * @param Request $request
 	 *
-	 * @return BinaryFileResponse
+	 * @return \Illuminate\Http\JsonResponse
 	 * @throws \JsonException
 	 */
-	public function __invoke(Request $request): BinaryFileResponse
+	public function __invoke(Request $request): \Illuminate\Http\JsonResponse
 	{
-		$data = $request->input('data');
+		$data = $request->validate([
+			'data'     => 'required|array',
+			'filetype' => 'required'
+		]);
 
-		$exporter = new JsonExporter();
+		switch ($request->input('filetype')) {
+			case 'csv':
+				$exporter = new CsvExporter();
+				break;
+			case 'json':
+				$exporter = new JsonExporter();
+				break;
+		}
 
-		if(!$exporter instanceof Exporter) {
+		if (!$exporter instanceof Exporter) {
 			throw new UnknownClassException('Class is not instance of Exporter interface.');
 		}
 
-		$filename = $exporter->execute($data);
+		$filename = $exporter->execute(Arr::get($data, 'data'));
 
-		$headers = array(
-			'Content-Type: application/octet-stream',
-		);
-
-		return response()
-			->download(Storage::disk('public')->path('/').$filename, $filename, $headers)
-			->deleteFileAfterSend(true);
-    }
+		return response()->json([
+			'data'      => $filename,
+			'mime_type' => Storage::disk('public')->mimeType($filename)
+		]);
+	}
 }
