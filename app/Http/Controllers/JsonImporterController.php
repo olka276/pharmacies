@@ -7,6 +7,7 @@ use App\Transformers\JsonFileTransformer;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,7 +24,14 @@ class JsonImporterController extends Controller
 	public function __invoke(Request $request): JsonResponse
 	{
 		$request->validate([
-			'json_file' => 'required|mimes:json'
+			'json_file' => [
+				function($attribute, $value, $fail) {
+					$extension = $value->getClientOriginalExtension();
+					if($extension !== 'json') {
+						$fail('Invalid type of file.');
+					}
+				}
+			]
 		]);
 
 		$pharmaciesData = JsonFileTransformer::execute($request->file('json_file'));

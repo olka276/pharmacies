@@ -8,6 +8,13 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DownloadController extends Controller
 {
+	/**
+	 * Download file from request.
+	 *
+	 * @param Request $request
+	 *
+	 * @return BinaryFileResponse
+	 */
 	public function __invoke(Request $request): BinaryFileResponse
 	{
 		$filename = $request->input('filename');

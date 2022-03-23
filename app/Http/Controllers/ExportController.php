@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exporters\CsvExporter;
 use App\Exporters\Exporter;
 use App\Exporters\JsonExporter;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -19,10 +20,10 @@ class ExportController extends Controller
 	 *
 	 * @param Request $request
 	 *
-	 * @return \Illuminate\Http\JsonResponse
+	 * @return JsonResponse
 	 * @throws \JsonException
 	 */
-	public function __invoke(Request $request): \Illuminate\Http\JsonResponse
+	public function __invoke(Request $request): JsonResponse
 	{
 		$data = $request->validate([
 			'data'     => 'required|array',
