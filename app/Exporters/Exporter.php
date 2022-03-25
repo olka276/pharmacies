@@ -9,7 +9,6 @@ interface Exporter
 	 *
 	 * @param array $data
 	 *
-	 * @return string
 	 */
-	public function execute(array $data): string;
+	public function execute(array $data);
 }

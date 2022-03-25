@@ -19,6 +19,6 @@ class JsonExporter implements Exporter
 		$encoded = json_encode($data, JSON_THROW_ON_ERROR);
 		Storage::disk('public')->put($filename, $encoded, 'public');
 
-		return $filename;
+		return Storage::disk('public')->path($filename);
 	}
 }

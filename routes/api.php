@@ -16,5 +16,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/', [JsonImporterController::class, '__invoke'])->name('uploader');
 Route::get('/pharmacies', [PharmaciesController::class, 'index']);
-Route::post('/export', [ExportController::class, '__invoke']);
-Route::get('/download', [DownloadController::class, '__invoke']);
+Route::post('/export', [ExportControler::class, '__invoke']);

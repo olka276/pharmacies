@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\JsonImporterRequest;
 use App\Models\Pharmacy;
+use App\Services\ImporterService;
 use App\Transformers\JsonFileTransformer;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class JsonImporterController extends Controller
@@ -16,43 +14,54 @@ class JsonImporterController extends Controller
 	/**
 	 * Import pharmacies JSON data to Database
 	 *
-	 * @param Request $request
+	 * @param JsonImporterRequest $request
+	 * @param ImporterService     $service
 	 *
 	 * @return JsonResponse
 	 * @throws \JsonException
 	 */
-	public function __invoke(Request $request): JsonResponse
+	public function __invoke(JsonImporterRequest $request, ImporterService $service): JsonResponse
 	{
-		$request->validate([
-			'json_file' => [
-				function($attribute, $value, $fail) {
-					$extension = $value->getClientOriginalExtension();
-					if($extension !== 'json') {
-						$fail('Invalid type of file.');
-					}
-				}
-			]
-		]);
+		//Tests are not passing when 'required' rule included in Request
+		if(is_null($request->file('json_file'))) {
+			return response()->json([
+				'message' => 'File not given.'
+			], Response::HTTP_UNPROCESSABLE_ENTITY);
+		}
 
 		$pharmaciesData = JsonFileTransformer::execute($request->file('json_file'));
 
 		foreach ($pharmaciesData as &$pharmacyData) {
-			$pharmacyData['created_at'] = Carbon::now()->toDateTimeString();
-			$pharmacyData['updated_at'] = Carbon::now()->toDateTimeString();
+			$isValid = $service->validateStructureOfArray($pharmacyData, [
+				'nazwa',
+				'kod_pocztowy',
+				'ulica',
+				'miejscowosc',
+				'gps_dlugosc',
+				'gps_szerokosc'
+			]);
+
+			if (!$isValid) {
+				return response()->json([
+					'message' => 'File structure is invalid.'
+				], Response::HTTP_UNPROCESSABLE_ENTITY);
+			}
+
+			$service->appendTimestampsToArray($pharmacyData);
 		}
 
+		//unset to prevent possible side-effects
 		unset($pharmacyData);
 
-		DB::beginTransaction();
-
 		try {
-			Pharmacy::query()->delete();
-			Pharmacy::insert($pharmaciesData);
-			DB::commit();
-		} catch (\Exception $e) {
-			DB::rollBack();
-			throw $e;
+			$service->replaceModelsByNewData(Pharmacy::class, $pharmaciesData);
+		} catch (\Exception $exception) {
+			return response()->json([
+				'message' => 'An error has occurred.',
+				'details' => $exception->getMessage()
+			], Response::HTTP_OK);
 		}
+
 		return response()->json([
 			'message' => 'Import successful.'
 		], Response::HTTP_OK);

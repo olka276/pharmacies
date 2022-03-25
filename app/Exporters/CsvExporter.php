@@ -11,18 +11,18 @@ class CsvExporter implements Exporter
 	 *
 	 * @param array $data
 	 *
-	 * @return string
 	 */
 	public function execute(array $data): string
 	{
 		$filename = time()."-search-results.csv";
-		$fp = fopen(Storage::disk('public')->path('/').$filename, 'wb');
+		$fp = fopen($path = Storage::disk('public')->path('/').$filename, 'wb');
 
 		foreach ($data as $fields) {
 			fputcsv($fp, $fields);
 		}
 
 		fclose($fp);
-		return $filename;
+
+		return $path;
 	}
 }
